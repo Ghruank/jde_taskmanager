@@ -8,7 +8,9 @@ from routes.taskRoute import router as task_router
 
 load_dotenv()
 app = FastAPI()
-allowed_origin = ["http://localhost:5173"]
+
+# Use environment variables for configuration
+allowed_origin = [os.getenv("ALLOWED_ORIGIN", "http://localhost:5173")]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origin,
@@ -21,4 +23,9 @@ app.include_router(task_router, prefix="/tasks")
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=int(os.getenv("PORT", 8000)),  # Use PORT from environment variables
+        reload=True
+    )
