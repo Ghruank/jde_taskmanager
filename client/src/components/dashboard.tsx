@@ -5,7 +5,7 @@ import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from './ThemeToggle';
-import { useTheme } from '../context/ThemeContext';
+// import { useTheme } from '../context/ThemeContext';
 import AuthComponent from './AuthComponent';
 import axios from 'axios';
 import '../styles/Dashboard.css';
@@ -28,7 +28,7 @@ const TaskItem: React.FC<{
   toggleComplete: (id: string) => void;
   deleteTask: (id: string) => void;
 }> = ({ task, index, moveTask, toggleComplete, deleteTask }) => {
-  const { theme } = useTheme();
+  // const { theme } = useTheme();
   const ref = useRef<HTMLDivElement>(null);
   
   const [{ isDragging }, drag] = useDrag({
@@ -41,7 +41,7 @@ const TaskItem: React.FC<{
 
   const [, drop] = useDrop({
     accept: 'TASK',
-    hover: (item: { id: string, index: number }, monitor) => {
+    hover: (item: { id: string, index: number }) => {
       if (!ref.current) {
         return;
       }
@@ -66,10 +66,7 @@ const TaskItem: React.FC<{
   // Initialize drag and drop refs
   drag(drop(ref));
 
-  // Calculate if task is due soon (within next 2 days)
-  const isDueSoon = task.dueDate && 
-    task.dueDate.getTime() - new Date().getTime() < 2 * 24 * 60 * 60 * 1000 && 
-    task.dueDate.getTime() > new Date().getTime();
+  // Removed unused '_isDueSoon' variable
     
   // Calculate if task is overdue
   const isOverdue = task.dueDate && 
@@ -120,7 +117,7 @@ const TaskItem: React.FC<{
 
 // Dashboard Component
 const Dashboard: React.FC = () => {
-  const { theme } = useTheme();
+  // const { theme } = useTheme();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [taskTag, setTaskTag] = useState('personal'); // Default to 'personal'
