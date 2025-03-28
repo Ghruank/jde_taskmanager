@@ -44,7 +44,7 @@ const AuthComponent: React.FC<AuthProps> = ({ onLogin, isLoggedIn, username, onL
           return;
         }
 
-        const response = await axios.post('http://localhost:8000/auth/register', {
+        const response = await axios.post('https://jde-taskmanager.onrender.com/auth/register', { // Updated URL
           email,
           password,
           username: signupUsername
@@ -60,7 +60,7 @@ const AuthComponent: React.FC<AuthProps> = ({ onLogin, isLoggedIn, username, onL
         }
       } else {
         // Login
-        const response = await axios.post('http://localhost:8000/auth/login', {
+        const response = await axios.post('https://jde-taskmanager.onrender.com/auth/login', { // Updated URL
           email,
           password
         });
