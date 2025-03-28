@@ -10,7 +10,7 @@ load_dotenv()
 app = FastAPI()
 
 # Use environment variables for configuration
-allowed_origin = [os.getenv("ALLOWED_ORIGIN", "http://localhost:5173")]
+allowed_origin = ["https://jde-taskmanager.vercel.app"]  # Allow only this specific origin
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origin,
