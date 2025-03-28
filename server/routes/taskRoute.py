@@ -27,12 +27,19 @@ async def get_current_user(authorization: Optional[str] = Header(None)):
 @router.get("/all", response_model=TasksResponse)
 async def get_tasks(user_id: str = Depends(get_current_user)):
     try:
+        # Fetch tasks for the user
         response = supabase.table("tasks").select("*").eq("user_id", user_id).execute()
         
         if not response.data:
-            return {"error": False, "tasks": []}
+            error_message = response.json().get("message", "Unknown error")
+            raise HTTPException(status_code=500, detail=f"Supabase error: {error_message}")
         
-        return {"error": False, "tasks": response.data}
+        tasks = response.data
+        
+        # Log the tasks being returned
+        print(f"Fetched tasks for user {user_id}: {tasks}")
+        
+        return {"error": False, "tasks": tasks}
     except Exception as e:
         print(f"Get tasks error: {str(e)}")
         return {"error": True, "tasks": []}
@@ -40,6 +47,10 @@ async def get_tasks(user_id: str = Depends(get_current_user)):
 @router.post("/create", response_model=TaskResponse)
 async def create_task(task: TaskCreate, user_id: str = Depends(get_current_user)):
     try:
+        # Ensure Supabase client is properly initialized
+        if not SUPABASE_URL or not SUPABASE_KEY:
+            raise HTTPException(status_code=500, detail="Supabase configuration is missing")
+
         # Generate a string ID instead of UUID
         task_id = str(uuid.uuid4())
         
@@ -53,15 +64,20 @@ async def create_task(task: TaskCreate, user_id: str = Depends(get_current_user)
             "dueDate": task.dueDate.isoformat() if task.dueDate else None
         }
         
+        # Insert task into the database
         response = supabase.table("tasks").insert(task_data).execute()
         
         if not response.data:
-            raise HTTPException(status_code=500, detail="Failed to create task")
+            error_message = response.json().get("message", "Unknown error")
+            raise HTTPException(status_code=500, detail=f"Supabase error: {error_message}")
             
         return response.data[0]
+    except HTTPException as http_exc:
+        # Re-raise HTTP exceptions to preserve status codes
+        raise http_exc
     except Exception as e:
         print(f"Create task error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="An unexpected error occurred while creating the task")
 
 @router.put("/update/{task_id}", response_model=TaskResponse)
 async def update_task(task_id: str, task: TaskUpdate, user_id: str = Depends(get_current_user)):
@@ -70,7 +86,8 @@ async def update_task(task_id: str, task: TaskUpdate, user_id: str = Depends(get
         verify_response = supabase.table("tasks").select("id").eq("id", task_id).eq("user_id", user_id).execute()
         
         if not verify_response.data:
-            raise HTTPException(status_code=404, detail="Task not found or unauthorized")
+            error_message = verify_response.json().get("message", "Task not found or unauthorized")
+            raise HTTPException(status_code=404, detail=error_message)
         
         # Build update data removing None values
         update_data = {k: v for k, v in task.dict().items() if v is not None}
@@ -82,7 +99,8 @@ async def update_task(task_id: str, task: TaskUpdate, user_id: str = Depends(get
         response = supabase.table("tasks").update(update_data).eq("id", task_id).eq("user_id", user_id).execute()
         
         if not response.data:
-            raise HTTPException(status_code=500, detail="Failed to update task")
+            error_message = response.json().get("message", "Failed to update task")
+            raise HTTPException(status_code=500, detail=error_message)
             
         return response.data[0]
     except Exception as e:
@@ -96,9 +114,14 @@ async def delete_task(task_id: str, user_id: str = Depends(get_current_user)):
         verify_response = supabase.table("tasks").select("id").eq("id", task_id).eq("user_id", user_id).execute()
         
         if not verify_response.data:
-            raise HTTPException(status_code=404, detail="Task not found or unauthorized")
+            error_message = verify_response.json().get("message", "Task not found or unauthorized")
+            raise HTTPException(status_code=404, detail=error_message)
         
         response = supabase.table("tasks").delete().eq("id", task_id).eq("user_id", user_id).execute()
+        
+        if not response.data:
+            error_message = response.json().get("message", "Failed to delete task")
+            raise HTTPException(status_code=500, detail=error_message)
         
         return {"success": True, "message": "Task deleted successfully"}
     except Exception as e:
