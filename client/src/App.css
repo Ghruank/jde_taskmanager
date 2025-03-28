@@ -1,0 +1,850 @@
+:root {
+  /* Light theme - default variables */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --text-primary: #333333;
+  --text-secondary: #6c757d;
+  --border-color: rgba(0, 0, 0, 0.1);
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --accent-color: #3f72af;
+  --accent-hover: #112d4e;
+  --card-bg: #ffffff;
+  --input-bg: #ffffff;
+  --divider-color: #e9ecef;
+
+  /* Keep your existing color variables */
+  --primary-color: #0275d8;
+  --primary-hover-color: #0056b3;
+  --success-color: #28a745;
+  --danger-color: #dc3545;
+  --warning-color: #ffc107;
+  --info-color: #17a2b8;
+  --light-color: #f8f9fa;
+  --dark-color: #343a40;
+  
+  --bg-color: #ffffff;
+  --bg-secondary-color: #f8f9fa;
+  --text-color: #333333;
+  --text-muted: #6c757d;
+  
+  --success-color-light: rgba(40, 167, 69, 0.15);
+  --danger-color-light: rgba(220, 53, 69, 0.15);
+  --warning-color-light: rgba(255, 193, 7, 0.15);
+  --info-color-light: rgba(23, 162, 184, 0.15);
+}
+
+/* Dark theme overrides */
+html[data-theme='dark'] {
+  --bg-primary: #121212;
+  --bg-secondary: #1e1e2d;
+  --text-primary: #e0e0e0;
+  --text-secondary: #adb5bd;
+  --border-color: #2d3748;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --accent-color: #4e95d6;
+  --accent-hover: #77b6f7;
+  --card-bg: #1e1e2d;
+  --input-bg: #2d3748;
+  --divider-color: #2d3748;
+
+  /* Update dark theme colors */
+  --primary-color: #0d6efd;
+  --primary-hover-color: #0b5ed7;
+  --success-color: #198754;
+  --danger-color: #dc3545;
+  --warning-color: #ffc107;
+  --info-color: #0dcaf0;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.App {
+  background-color: var(--bg-color);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+input, select, button {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-hover-color);
+}
+
+body, html, #root {
+  width: 100%;
+  height: 100%;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.App {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-container {
+  flex: 1;
+  background-color: var(--bg-primary);
+  padding: 20px 30px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--divider-color);
+}
+
+.dashboard-container h1 {
+  font-size: 2.5rem;
+  color: var(--text-primary);
+  text-align: left;
+}
+
+.theme-toggle {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+  margin: 0;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+  background-color: var(--bg-secondary);
+}
+
+.theme-toggle:active {
+  transform: scale(0.95);
+}
+
+.add-task-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 25px;
+  padding: 20px;
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.add-task-form input,
+.add-task-form select,
+.react-datepicker-wrapper,
+.react-datepicker__input-container input {
+  padding: 12px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+}
+
+.add-task-form input:focus,
+.add-task-form select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(63, 114, 175, 0.2);
+}
+
+.add-task-form input {
+  flex: 1;
+  min-width: 250px;
+}
+
+.add-task-form button {
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s;
+  min-width: 120px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.add-task-form button:hover {
+  background-color: var(--accent-hover);
+}
+
+.filters-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 25px;
+  gap: 15px;
+  padding: 0 5px;
+}
+
+.search-bar {
+  flex: 1;
+  min-width: 250px;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+}
+
+.search-bar input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(63, 114, 175, 0.2);
+}
+
+.filter-options {
+  display: flex;
+  gap: 15px;
+}
+
+.filter-options select {
+  padding: 12px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  min-width: 140px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-options select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+/* Task list - horizontal layout (one below another) */
+.task-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 5px;
+  display: flex;
+  flex-direction: column; /* Cards stacked vertically */
+}
+
+.task-list > p {
+  text-align: center;
+  padding: 40px 0;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+/* Task item styling */
+.task-item {
+  transition: all 0.3s ease;
+  margin-bottom: 15px;
+  background-color: var(--card-bg);
+  box-shadow: 0 3px 10px var(--shadow-color);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: row; /* Content inside card is horizontal */
+  justify-content: space-between;
+  align-items: center;
+  animation: fadeInUp 0.3s ease-out;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.task-item.dragging {
+  opacity: 0.5;
+  transform: scale(1.02);
+}
+
+.task-item.completed {
+  opacity: 0.7;
+}
+
+.task-details {
+  flex: 1;
+}
+
+.task-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.task-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.task-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.task-actions button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.task-actions button:hover {
+  background-color: var(--border-color);
+}
+
+.task-actions button:first-child {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.task-actions button:first-child:hover {
+  background-color: var(--accent-hover);
+}
+
+.task-actions button:last-child {
+  background-color: rgba(255, 62, 78, 0.1);
+  color: var(--danger-color);
+}
+
+.task-actions button:last-child:hover {
+  background-color: rgba(255, 62, 78, 0.2);
+}
+
+.priority-high {
+  border-left: 4px solid var(--danger-color);
+}
+
+.priority-medium {
+  border-left: 4px solid var(--warning-color);
+}
+
+.priority-low {
+  border-left: 4px solid var(--success-color);
+}
+
+/* Category styling */
+.category-work {
+  background-color: var(--bg-primary) !important;
+  border: 1px solid var(--accent-color);
+  color: var(--accent-color) !important;
+}
+
+.category-personal {
+  background-color: var(--bg-primary) !important;
+  border: 1px solid var(--success-color);
+  color: var(--success-color) !important;
+}
+
+.category-groceries {
+  background-color: var(--bg-primary) !important;
+  border: 1px solid var(--warning-color);
+  color: var(--warning-color) !important;
+}
+
+.category-health {
+  background-color: var(--bg-primary) !important;
+  border: 1px solid #7048e8;
+  color: #7048e8 !important;
+}
+
+.category-finance {
+  background-color: var(--bg-primary) !important;
+  border: 1px solid #0ca678;
+  color: #0ca678 !important;
+}
+
+/* Button styling */
+.btn-primary {
+  background-color: var(--accent-color) !important;
+  color: white !important;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-hover) !important;
+}
+
+.btn-completed {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-secondary) !important;
+}
+
+.btn-danger {
+  background-color: rgba(255, 62, 78, 0.1) !important;
+  color: var(--danger-color) !important;
+}
+
+.btn-danger:hover {
+  background-color: rgba(255, 62, 78, 0.2) !important;
+}
+
+.task-stats {
+  margin-top: 25px;
+  padding: 15px;
+  background-color: var(--card-bg);
+  border-radius: 10px;
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  box-shadow: 0 2px 6px var(--shadow-color);
+}
+
+/* Animation for new tasks */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* React DatePicker dark mode overrides */
+[data-theme='dark'] .react-datepicker {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+[data-theme='dark'] .react-datepicker__header {
+  background-color: var(--bg-primary);
+  border-color: var(--border-color);
+}
+
+[data-theme='dark'] .react-datepicker__current-month,
+[data-theme='dark'] .react-datepicker__day-name,
+[data-theme='dark'] .react-datepicker__day {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .react-datepicker__day:hover {
+  background-color: var(--accent-color);
+}
+
+[data-theme='dark'] .react-datepicker__day--selected {
+  background-color: var(--accent-color);
+}
+
+[data-theme='dark'] .react-datepicker__day--keyboard-selected {
+  background-color: var(--accent-hover);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 15px;
+  }
+
+  .dashboard-container h1 {
+    font-size: 1.8rem;
+  }
+
+  .add-task-form,
+  .filters-container,
+  .filter-options {
+    flex-direction: column;
+  }
+  
+  .add-task-form input, 
+  .add-task-form select, 
+  .add-task-form button,
+  .react-datepicker-wrapper {
+    width: 100%;
+  }
+  
+  .task-item {
+    flex-direction: column;
+  }
+  
+  .task-actions {
+    margin-top: 10px;
+    width: 100%;
+    justify-content: flex-end;
+  }
+  
+  .filter-options select {
+    width: 100%;
+  }
+}
+
+/* Remove grid layout for large screens */
+@media (min-width: 1400px) {
+  .dashboard-container {
+    padding: 30px 60px;
+  }
+  
+  /* Remove grid layout to ensure horizontal cards */
+  .task-list {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .task-item {
+    width: 100%;
+    margin-bottom: 15px;
+  }
+}
+
+/* Floating add button for mobile */
+@media (max-width: 600px) {
+  .add-task-form {
+    position: relative;
+  }
+  
+  .dashboard-container {
+    padding-bottom: 80px;
+  }
+}
+
+/* Update button styles */
+.add-task-button,
+.auth-button,
+.submit-button,
+.logout-button {
+  background-color: var(--accent-color);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.add-task-button:hover,
+.auth-button:hover,
+.submit-button:hover,
+.logout-button:hover {
+  background-color: var(--accent-hover);
+}
+
+/* Form input styles */
+input,
+select {
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+/* Auth panel styles */
+.auth-panel {
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+}
+
+.auth-tabs button {
+  color: var(--text-primary);
+  background-color: transparent;
+  border: none;
+  padding: 8px 16px;
+}
+
+.auth-tabs button.active {
+  color: var(--accent-color);
+  border-bottom: 2px solid var(--accent-color);
+}
+
+/* Task meta information */
+.task-meta {
+  color: var(--text-secondary);
+}
+
+/* Section titles */
+.section-title {
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+/* Clear filters button */
+.clear-filters-button {
+  background-color: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.clear-filters-button:hover:not(:disabled) {
+  background-color: var(--bg-secondary);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.clear-filters-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  color: var(--text-secondary);
+}
+
+/* Ensure the theme variables are properly applied */
+:root[data-theme='light'] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --text-primary: #333333;
+  --text-secondary: #6c757d;
+  --border-color: rgba(0, 0, 0, 0.1);
+  --card-bg: #ffffff;
+  --input-bg: #ffffff;
+}
+
+:root[data-theme='dark'] {
+  --bg-primary: #121212;
+  --bg-secondary: #1e1e2d;
+  --text-primary: #e0e0e0;
+  --text-secondary: #adb5bd;
+  --border-color: #2d3748;
+  --card-bg: #1e1e2d;
+  --input-bg: #2d3748;
+}
+
+/* Update DatePicker styles */
+.react-datepicker {
+  font-family: inherit !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 8px !important;
+  background-color: var(--card-bg) !important;
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.react-datepicker__header {
+  background-color: var(--bg-secondary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  border-top-left-radius: 8px !important;
+  border-top-right-radius: 8px !important;
+  padding-top: 12px !important;
+}
+
+.react-datepicker__current-month {
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+}
+
+.react-datepicker__day-name {
+  color: var(--text-secondary) !important;
+}
+
+.react-datepicker__day {
+  color: var(--text-primary) !important;
+  border-radius: 4px !important;
+}
+
+.react-datepicker__day:hover {
+  background-color: var(--bg-secondary) !important;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background-color: var(--accent-color) !important;
+  color: white !important;
+}
+
+.react-datepicker__day--disabled {
+  color: var(--text-secondary) !important;
+  opacity: 0.5;
+}
+
+.react-datepicker__navigation-icon::before {
+  border-color: var(--text-primary) !important;
+}
+
+.react-datepicker__navigation:hover *::before {
+  border-color: var(--accent-color) !important;
+}
+
+/* Style the date picker input */
+.react-datepicker-wrapper {
+  width: auto;
+}
+
+.react-datepicker__input-container input {
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  width: 130px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.react-datepicker__input-container input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(63, 114, 175, 0.2);
+}
+
+.react-datepicker__input-container input::placeholder {
+  color: var(--text-secondary);
+}
+
+/* Add a subtle triangle indicator to the date input */
+.react-datepicker__input-container {
+  position: relative;
+}
+
+.react-datepicker__input-container::after {
+  content: "▼";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  pointer-events: none;
+}
+
+/* Update the month/year selection dropdowns if visible */
+.react-datepicker__month-select,
+.react-datepicker__year-select {
+  background-color: var(--input-bg) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 4px;
+  padding: 4px 8px !important;
+}
+
+/* Today's date highlight */
+.react-datepicker__day--today {
+  font-weight: bold !important;
+  border: 1px solid var(--accent-color) !important;
+}
+
+/* Outside month dates */
+.react-datepicker__day--outside-month {
+  color: var(--text-secondary) !important;
+  opacity: 0.5;
+}
+
+/* Update the date picker input size to match other inputs */
+.react-datepicker-wrapper,
+.react-datepicker__input-container,
+.react-datepicker__input-container input {
+  width: 100% !important;
+  min-width: 140px !important;
+  height: 100% !important;
+}
+
+/* Make sure the input matches exactly */
+.react-datepicker__input-container input {
+  padding: 12px 16px !important;
+  height: 45px !important;
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure the wrapper and container don't affect the input size */
+.react-datepicker-wrapper,
+.react-datepicker__input-container {
+  height: 45px !important;
+  display: block !important;
+}
+
+/* Make the calendar navigation arrows smaller and more subtle */
+.react-datepicker__navigation {
+  top: 8px !important;
+  width: 24px !important;
+  height: 24px !important;
+}
+
+.react-datepicker__navigation-icon {
+  transform: scale(0.7) !important;
+}
+
+.react-datepicker__navigation-icon::before {
+  border-width: 2px 2px 0 0 !important;
+  height: 8px !important;
+  width: 8px !important;
+  top: 6px !important;
+}
+
+/* Adjust the position of the navigation icons */
+.react-datepicker__navigation--previous {
+  left: 8px !important;
+}
+
+.react-datepicker__navigation--next {
+  right: 8px !important;
+}
+
+/* Remove the dropdown arrow since it looks awkward with full width */
+.react-datepicker__input-container::after {
+  display: none;
+}
