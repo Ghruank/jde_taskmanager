@@ -5,7 +5,6 @@ import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from './ThemeToggle';
-// import { useTheme } from '../context/ThemeContext';
 import AuthComponent from './AuthComponent';
 import axios from 'axios';
 import '../styles/Dashboard.css';
@@ -28,7 +27,6 @@ const TaskItem: React.FC<{
   toggleComplete: (id: string) => void;
   deleteTask: (id: string) => void;
 }> = ({ task, index, moveTask, toggleComplete, deleteTask }) => {
-  // const { theme } = useTheme();
   const ref = useRef<HTMLDivElement>(null);
   
   const [{ isDragging }, drag] = useDrag({
@@ -48,27 +46,17 @@ const TaskItem: React.FC<{
       const dragIndex = item.index;
       const hoverIndex = index;
       
-      // Don't replace items with themselves
       if (dragIndex === hoverIndex) {
         return;
       }
       
       moveTask(dragIndex, hoverIndex);
-      
-      // Note: we're mutating the monitor item here!
-      // Generally it's better to avoid mutations,
-      // but it's good here for the sake of performance
-      // to avoid expensive index searches.
       item.index = hoverIndex;
     },
   });
   
-  // Initialize drag and drop refs
   drag(drop(ref));
-
-  // Removed unused '_isDueSoon' variable
     
-  // Calculate if task is overdue
   const isOverdue = task.dueDate && 
     task.dueDate.getTime() < new Date().getTime() && 
     !task.completed;
@@ -116,8 +104,7 @@ const TaskItem: React.FC<{
 };
 
 // Dashboard Component
-const Dashboard: React.FC = () => {
-  // const { theme } = useTheme();
+const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [taskTag, setTaskTag] = useState('personal'); // Default to 'personal'
@@ -128,9 +115,10 @@ const Dashboard: React.FC = () => {
   const [filter, setFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('priority');
+  const [sortBy, setSortBy] = useState('default'); // Changed default to 'default' instead of 'priority'
   
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isGuestMode, setIsGuestMode] = useState(false);
   const [username, setUsername] = useState('');
   const [token, setToken] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -143,45 +131,75 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  // Check for existing token on component mount
+  // Add a handler for mobile task details
+  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
+
+  const toggleTaskExpansion = (id: string) => {
+    setExpandedTaskId(expandedTaskId === id ? null : id);
+  };
+
+  // Load tasks when the component mounts
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     const storedUsername = localStorage.getItem('username');
-    
-    if (storedToken && storedUsername) {
+    const isGuestMode = localStorage.getItem('guestMode') === 'true';
+
+    if (isGuestMode) {
+      console.log('Guest mode enabled. Loading tasks from local storage.');
+      setUsername('Guest');
+      setIsLoggedIn(false);
+      setIsGuestMode(true);
+      const storedTasks = localStorage.getItem('guestTasks');
+      if (storedTasks) {
+        try {
+          const parsedTasks = JSON.parse(storedTasks);
+          console.log('Loaded tasks from local storage:', parsedTasks);
+          setTasks(parsedTasks);
+        } catch (error) {
+          console.error('Error parsing tasks from local storage:', error);
+          setTasks([]);
+        }
+      } else {
+        console.log('No tasks found in local storage.');
+        setTasks([]);
+      }
+    } else if (storedToken && storedUsername) {
+      console.log('User logged in. Loading tasks from server.');
       setToken(storedToken);
       setUsername(storedUsername);
       setIsLoggedIn(true);
     }
-    
+
     setIsLoading(false);
   }, []);
 
-  // Load tasks when user is authenticated
+  // Save tasks to local storage in guest mode
   useEffect(() => {
-    if (isLoggedIn && token) {
-      fetchTasks();
-    } else {
-      setTasks([]);
+    const isGuestMode = localStorage.getItem('guestMode') === 'true';
+    if (isGuestMode) {
+      console.log('Saving tasks to local storage:', tasks);
+      localStorage.setItem('guestTasks', JSON.stringify(tasks));
     }
-  }, [isLoggedIn, token]);
+  }, [tasks]);
 
-  // Fetch tasks from the server
+  // Fetch tasks from the server (only if logged in)
   const fetchTasks = async () => {
+    const isGuestMode = localStorage.getItem('guestMode') === 'true';
+    if (!isLoggedIn || isGuestMode) return; // Skip API call in guest mode
+
     try {
-      const response = await axios.get('https://jde-taskmanager.onrender.com/tasks/all', { // Updated URL
+      const response = await axios.get('https://jde-taskmanager.onrender.com/tasks/all', {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      
+
       if (!response.data.error) {
-        // Convert string dates to Date objects
         const formattedTasks = response.data.tasks.map((task: any) => ({
           ...task,
-          dueDate: task.dueDate ? new Date(task.dueDate) : null
+          dueDate: task.dueDate ? new Date(task.dueDate) : null,
         }));
-        
+
         setTasks(formattedTasks);
       }
     } catch (error) {
@@ -191,95 +209,118 @@ const Dashboard: React.FC = () => {
 
   // Handle login success
   const handleLogin = (newToken: string, newUsername: string) => {
+    const isGuestMode = newUsername === 'Guest' && newToken === '';
+    
     setToken(newToken);
     setUsername(newUsername);
-    setIsLoggedIn(true);
+    setIsLoggedIn(!isGuestMode); // Only set to true if NOT in guest mode
+    setIsGuestMode(isGuestMode); // Set guest mode state
+    
+    if (isGuestMode) {
+      console.log('Entering guest mode');
+      // Load tasks from local storage if available
+      const storedTasks = localStorage.getItem('guestTasks');
+      if (storedTasks) {
+        try {
+          const parsedTasks = JSON.parse(storedTasks);
+          setTasks(parsedTasks);
+        } catch (error) {
+          console.error('Error parsing tasks from local storage:', error);
+          setTasks([]);
+        }
+      }
+    }
   };
 
   // Handle logout
   const handleLogout = () => {
     setIsLoggedIn(false);
+    setIsGuestMode(false);
     setUsername('');
     setToken('');
     setTasks([]);
+    onLogout();
   };
 
   // Add a new task
   const addTask = async () => {
-    if (newTaskTitle.trim() !== '' && taskTag.trim() !== '' && isLoggedIn) {
-      try {
-        const response = await axios.post(
-          'https://jde-taskmanager.onrender.com/tasks/create', // Updated URL
-          {
-            title: newTaskTitle,
-            category: taskTag, // Use the selected or custom tag
-            priority: newTaskPriority,
-            completed: false,
-            dueDate: newTaskDueDate,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+    if (newTaskTitle.trim() !== '' && taskTag.trim() !== '') {
+      const newTask = {
+        id: Date.now().toString(),
+        title: newTaskTitle,
+        category: taskTag,
+        priority: newTaskPriority,
+        completed: false,
+        dueDate: newTaskDueDate,
+      };
 
-        const newTask = {
-          ...response.data,
-          dueDate: response.data.dueDate ? new Date(response.data.dueDate) : null,
-        };
-
-        setTasks([...tasks, newTask]);
-        setNewTaskTitle('');
-        setTaskTag('personal'); // Reset to default tag
-        setNewTaskDueDate(null);
-      } catch (error) {
-        console.error('Error adding task:', error);
+      const isGuestMode = localStorage.getItem('guestMode') === 'true';
+      if (isLoggedIn && !isGuestMode) {
+        try {
+          const response = await axios.post(
+            'https://jde-taskmanager.onrender.com/tasks/create',
+            newTask,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          setTasks([...tasks, { ...response.data, dueDate: new Date(response.data.dueDate) }]);
+        } catch (error) {
+          console.error('Error adding task:', error);
+        }
+      } else {
+        console.log('Adding task in guest mode:', newTask);
+        setTasks([...tasks, newTask]); // Add task to state
       }
+
+      setNewTaskTitle('');
+      setTaskTag('personal');
+      setNewTaskDueDate(null);
     }
   };
 
   // Delete a task
   const deleteTask = async (id: string) => {
-    if (isLoggedIn) {
+    const isGuestMode = localStorage.getItem('guestMode') === 'true';
+    if (isLoggedIn && !isGuestMode) {
       try {
-        await axios.delete(`https://jde-taskmanager.onrender.com/tasks/delete/${id}`, { // Updated URL
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+        await axios.delete(`https://jde-taskmanager.onrender.com/tasks/delete/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
-        
         setTasks(tasks.filter(task => task.id !== id));
       } catch (error) {
         console.error('Error deleting task:', error);
       }
+    } else {
+      console.log('Deleting task in guest mode. Task ID:', id);
+      const updatedTasks = tasks.filter(task => task.id !== id);
+      setTasks(updatedTasks); // Update state
     }
   };
 
   // Toggle task completion
   const toggleComplete = async (id: string) => {
-    if (isLoggedIn) {
+    const taskToUpdate = tasks.find(task => task.id === id);
+    if (!taskToUpdate) return;
+
+    const updatedCompleted = !taskToUpdate.completed;
+    const isGuestMode = localStorage.getItem('guestMode') === 'true';
+
+    if (isLoggedIn && !isGuestMode) {
       try {
-        const taskToUpdate = tasks.find(task => task.id === id);
-        if (!taskToUpdate) return;
-        
-        const updatedCompleted = !taskToUpdate.completed;
-        
-        await axios.put(`https://jde-taskmanager.onrender.com/tasks/update/${id}`, { // Updated URL
-          completed: updatedCompleted
-        }, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        
-        setTasks(tasks.map(task => 
-          task.id === id ? { ...task, completed: updatedCompleted } : task
-        ));
+        await axios.put(
+          `https://jde-taskmanager.onrender.com/tasks/update/${id}`,
+          { completed: updatedCompleted },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
       } catch (error) {
         console.error('Error updating task:', error);
       }
     }
+
+    // Always update state regardless of guest mode
+    const updatedTasks = tasks.map(task =>
+      task.id === id ? { ...task, completed: updatedCompleted } : task
+    );
+    setTasks(updatedTasks);
   };
 
   // Move task (drag and drop) - improved implementation
@@ -287,18 +328,14 @@ const Dashboard: React.FC = () => {
     const newTasks = [...tasks];
     const draggedTask = filteredSortedTasks[dragIndex];
     
-    // Find the actual indices in the full tasks array
     const actualDragIndex = newTasks.findIndex(task => task.id === draggedTask.id);
     
     if (actualDragIndex !== -1) {
-      // Get the task at the hover position in the filtered view
       const hoverTask = filteredSortedTasks[hoverIndex];
       const actualHoverIndex = newTasks.findIndex(task => task.id === hoverTask.id);
       
       if (actualHoverIndex !== -1) {
-        // Remove the dragged task
         const [removed] = newTasks.splice(actualDragIndex, 1);
-        // Insert it at the new position
         newTasks.splice(actualHoverIndex, 0, removed);
         
         setTasks(newTasks);
@@ -311,31 +348,32 @@ const Dashboard: React.FC = () => {
     setFilter('all');
     setCategoryFilter('all');
     setSearchQuery('');
-    setSortBy('priority');
+    setSortBy('default'); // Changed from 'priority' to 'default'
   };
 
-  // Filter tasks based on current filters
+  // Get unique categories for the filter dropdown
+  const uniqueCategories = Array.from(new Set(tasks.map(task => task.category)));
+
   const filteredTasks = tasks
     .filter(task => {
-      // Filter by completion status
       if (filter === 'completed') return task.completed;
       if (filter === 'active') return !task.completed;
-      return true; // 'all'
+      return true;
     })
     .filter(task => {
-      // Filter by category
       if (categoryFilter === 'all') return true;
       return task.category === categoryFilter;
     })
     .filter(task => {
-      // Filter by search query
       if (searchQuery.trim() === '') return true;
       return task.title.toLowerCase().includes(searchQuery.toLowerCase());
     });
 
-  // Sort filtered tasks
   const filteredSortedTasks = [...filteredTasks].sort((a, b) => {
-    if (sortBy === 'priority') {
+    if (sortBy === 'default') {
+      // No sorting - keep in the order they appear in the tasks array
+      return 0;
+    } else if (sortBy === 'priority') {
       const priorityValues = { high: 3, medium: 2, low: 1 };
       return priorityValues[b.priority] - priorityValues[a.priority];
     } else if (sortBy === 'dueDate') {
@@ -356,7 +394,7 @@ const Dashboard: React.FC = () => {
         <div className="dashboard-title-area">
           <AuthComponent 
             onLogin={handleLogin} 
-            isLoggedIn={isLoggedIn} 
+            isLoggedIn={isLoggedIn || isGuestMode} 
             username={username} 
             onLogout={handleLogout}
           />
@@ -365,10 +403,9 @@ const Dashboard: React.FC = () => {
         <ThemeToggle />
       </div>
       
-      {isLoggedIn ? (
+      {isLoggedIn || isGuestMode ? (
         <div className="dashboard-content">
           <div className="left-panel">
-            {/* Task Addition Form */}
             <div className="add-task-container">
               <h2 className="section-title">Create New Task</h2>
               <div className="add-task-form">
@@ -439,14 +476,13 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
             
-            {/* Filters and Search */}
             <div className="filters-section">
               <div className="filters-header">
                 <h2 className="section-title">Find & Filter Tasks</h2>
                 <button 
                   onClick={clearFilters}
                   className="clear-filters-button"
-                  disabled={filter === 'all' && categoryFilter === 'all' && searchQuery === '' && sortBy === 'priority'}
+                  disabled={filter === 'all' && categoryFilter === 'all' && searchQuery === '' && sortBy === 'default'}
                 >
                   Clear Filters
                 </button>
@@ -479,8 +515,8 @@ const Dashboard: React.FC = () => {
                     className="filter-select"
                   >
                     <option value="all">All Categories</option>
-                    {tasks.map(task => (
-                      <option key={task.category} value={task.category}>{task.category}</option>
+                    {uniqueCategories.map(category => (
+                      <option key={category} value={category}>{category}</option>
                     ))}
                   </select>
                   
@@ -489,6 +525,7 @@ const Dashboard: React.FC = () => {
                     onChange={(e) => setSortBy(e.target.value)}
                     className="filter-select"
                   >
+                    <option value="default">Default Order</option>
                     <option value="priority">Sort by Priority</option>
                     <option value="dueDate">Sort by Due Date</option>
                   </select>
@@ -498,7 +535,6 @@ const Dashboard: React.FC = () => {
           </div>
 
           <div className="right-panel">
-            {/* Task List */}
             <div className="tasks-section">
               <h2 className="section-title">Your Tasks</h2>
               <DndProvider backend={HTML5Backend}>
@@ -526,7 +562,6 @@ const Dashboard: React.FC = () => {
               </DndProvider>
             </div>
             
-            {/* Task Statistics */}
             <div className="task-stats">
               <div className="stats-box">
                 <div className="stat-item">

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import '../styles/AuthComponent.css';
@@ -88,12 +88,42 @@ const AuthComponent: React.FC<AuthProps> = ({ onLogin, isLoggedIn, username, onL
     onLogout();
   };
 
+  const handleContinueAsGuest = () => {
+    localStorage.setItem('guestMode', 'true');
+    onLogin('', 'Guest'); // Set token as empty and username as 'Guest'
+    handleToggle();
+  };
+
+  // Close auth panel when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const authPanel = document.querySelector('.auth-panel');
+      const authButton = document.querySelector('.auth-button');
+      
+      if (isOpen && authPanel && authButton && 
+          !authPanel.contains(event.target as Node) && 
+          !authButton.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
+
   return (
     <div className="auth-container">
       {!isLoggedIn ? (
-        <button onClick={handleToggle} className="auth-button">
-          {isOpen ? 'Close' : 'Login / Sign Up'}
-        </button>
+        <div className="auth-buttons">
+          <button onClick={handleToggle} className="auth-button">
+            {isOpen ? 'Close' : 'Login / Sign Up'}
+          </button>
+          <button onClick={handleContinueAsGuest} className="guest-button">
+            Continue as Guest
+          </button>
+        </div>
       ) : (
         <div className="user-info">
           <span>Welcome, {username}</span>
@@ -103,87 +133,98 @@ const AuthComponent: React.FC<AuthProps> = ({ onLogin, isLoggedIn, username, onL
 
       <AnimatePresence>
         {isOpen && !isLoggedIn && (
-          <motion.div
-            className="auth-panel"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div className="auth-header">
-              <h2>{isSignUp ? 'Sign Up' : 'Login'}</h2>
-              <div className="auth-tabs">
-                <button 
-                  className={!isSignUp ? 'active' : ''} 
-                  onClick={() => setIsSignUp(false)}
-                >
-                  Login
+          <>
+            {/* Backdrop with higher z-index */}
+            <motion.div 
+              className="auth-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsOpen(false)}
+            />
+            
+            {/* Simplified animation for better mobile performance */}
+            <motion.div
+              className="auth-panel"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <div className="auth-header">
+                <h2>{isSignUp ? 'Sign Up' : 'Login'}</h2>
+                <div className="auth-tabs">
+                  <button 
+                    className={!isSignUp ? 'active' : ''} 
+                    onClick={() => setIsSignUp(false)}
+                  >
+                    Login
+                  </button>
+                  <button 
+                    className={isSignUp ? 'active' : ''} 
+                    onClick={() => setIsSignUp(true)}
+                  >
+                    Sign Up
+                  </button>
+                </div>
+              </div>
+
+              {error && <div className="auth-error">{error}</div>}
+
+              <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                  <label htmlFor="email">Email</label>
+                  <input
+                    type="email"
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="password">Password</label>
+                  <input
+                    type="password"
+                    id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+
+                {isSignUp && (
+                  <>
+                    <div className="form-group">
+                      <label htmlFor="confirmPassword">Confirm Password</label>
+                      <input
+                        type="password"
+                        id="confirmPassword"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label htmlFor="username">Username</label>
+                      <input
+                        type="text"
+                        id="username"
+                        value={signupUsername}
+                        onChange={(e) => setSignupUsername(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </>
+                )}
+
+                <button type="submit" className="submit-button" disabled={loading}>
+                  {loading ? 'Processing...' : (isSignUp ? 'Sign Up' : 'Login')}
                 </button>
-                <button 
-                  className={isSignUp ? 'active' : ''} 
-                  onClick={() => setIsSignUp(true)}
-                >
-                  Sign Up
-                </button>
-              </div>
-            </div>
-
-            {error && <div className="auth-error">{error}</div>}
-
-            <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label htmlFor="email">Email</label>
-                <input
-                  type="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="password">Password</label>
-                <input
-                  type="password"
-                  id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-
-              {isSignUp && (
-                <>
-                  <div className="form-group">
-                    <label htmlFor="confirmPassword">Confirm Password</label>
-                    <input
-                      type="password"
-                      id="confirmPassword"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="username">Username</label>
-                    <input
-                      type="text"
-                      id="username"
-                      value={signupUsername}
-                      onChange={(e) => setSignupUsername(e.target.value)}
-                      required
-                    />
-                  </div>
-                </>
-              )}
-
-              <button type="submit" className="submit-button" disabled={loading}>
-                {loading ? 'Processing...' : (isSignUp ? 'Sign Up' : 'Login')}
-              </button>
-            </form>
-          </motion.div>
+              </form>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </div>

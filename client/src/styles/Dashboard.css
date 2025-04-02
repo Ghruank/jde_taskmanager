@@ -662,3 +662,136 @@
 .auth-button:hover, .add-task-button:hover, .btn-primary:hover, .btn-completed:hover {
   background-color: var(--primary-hover-color);
 }
+
+/* Enhanced responsive adjustments */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 12px;
+  }
+
+  .dashboard-header {
+    padding: 10px 0;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+  }
+
+  .dashboard-title-area {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .app-title {
+    font-size: 1.6rem;
+    margin-left: 0;
+  }
+
+  .dashboard-content {
+    flex-direction: column;
+  }
+
+  .left-panel, .right-panel {
+    max-width: 100%;
+  }
+
+  .add-task-container, .filters-section, .tasks-section, .task-stats {
+    padding: 15px;
+  }
+
+  .select-group, .filter-options {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .stats-box {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .task-item {
+    padding: 12px;
+  }
+  
+  .task-actions {
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 12px;
+    margin-left: 0;
+  }
+  
+  .task-actions button {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+  
+  .task-select, .filter-select {
+    width: 100%;
+    max-width: none;
+  }
+  
+  .date-picker-container {
+    width: 100%;
+  }
+  
+  .task-date-picker {
+    width: 100%;
+  }
+  
+  .task-title {
+    font-size: 1rem;
+  }
+  
+  .task-meta {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  
+  .section-title {
+    font-size: 1.2rem;
+  }
+}
+
+/* Mobile portrait - extra small devices */
+@media (max-width: 480px) {
+  .task-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .task-meta span {
+    margin-bottom: 3px;
+  }
+  
+  .add-task-button {
+    font-size: 1rem;
+    padding: 12px;
+  }
+  
+  .add-task-button .button-icon {
+    font-size: 1.2rem;
+  }
+  
+  .login-prompt-content {
+    padding: 20px;
+  }
+  
+  .login-prompt-content h2 {
+    font-size: 1.5rem;
+  }
+  
+  .login-prompt-content p {
+    font-size: 1rem;
+  }
+  
+  .step-number {
+    width: 28px;
+    height: 28px;
+    font-size: 0.9rem;
+  }
+  
+  .step-text {
+    font-size: 0.9rem;
+  }
+}
