@@ -131,13 +131,6 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
     }
   };
 
-  // Add a handler for mobile task details
-  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
-
-  const toggleTaskExpansion = (id: string) => {
-    setExpandedTaskId(expandedTaskId === id ? null : id);
-  };
-
   // Load tasks when the component mounts
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
@@ -181,31 +174,6 @@ const Dashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
       localStorage.setItem('guestTasks', JSON.stringify(tasks));
     }
   }, [tasks]);
-
-  // Fetch tasks from the server (only if logged in)
-  const fetchTasks = async () => {
-    const isGuestMode = localStorage.getItem('guestMode') === 'true';
-    if (!isLoggedIn || isGuestMode) return; // Skip API call in guest mode
-
-    try {
-      const response = await axios.get('https://jde-taskmanager.onrender.com/tasks/all', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.data.error) {
-        const formattedTasks = response.data.tasks.map((task: any) => ({
-          ...task,
-          dueDate: task.dueDate ? new Date(task.dueDate) : null,
-        }));
-
-        setTasks(formattedTasks);
-      }
-    } catch (error) {
-      console.error('Error fetching tasks:', error);
-    }
-  };
 
   // Handle login success
   const handleLogin = (newToken: string, newUsername: string) => {
