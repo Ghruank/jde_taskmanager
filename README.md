@@ -1,116 +1,130 @@
-# Task Manager
+# 📝 Task Manager
 
-A modern, responsive task management application with drag-and-drop functionality, customizable categories, priority levels, and due dates. This application features both a cloud-based storage option for registered users and a local storage option for guest users.
+> **Hosted Live at: [jde-taskmanager.vercel.app](https://jde-taskmanager.vercel.app)**  
+> ⚡ **For the best experience, use the live site!**  
+> The application is fully functional online with cloud-based storage. Guest users can still use the full app with local storage.
 
-## Features
+---
 
-- **User Authentication**: Register, login, or continue as guest
-- **Task Management**: Create, edit, complete, and delete tasks
-- **Categorization**: Assign categories to tasks with custom category support
-- **Priority Levels**: Set high, medium, or low priority for tasks
-- **Due Dates**: Add due dates with overdue notifications
-- **Drag and Drop**: Reorder tasks with intuitive drag and drop
-- **Filtering & Sorting**: Filter by status/category and sort by priority/due date
-- **Responsive Design**: Works on desktops, tablets, and mobile devices
-- **Dark/Light Mode**: Toggle between themes for comfortable viewing
-- **Guest Mode**: Use the app without registration using local storage
+A modern, responsive task management application with:
 
-## Live Demo
+- Drag-and-drop task organization  
+- Customizable categories, priorities, and due dates  
+- Dark/light mode  
+- Offline (guest mode) support  
+- Persistent cloud storage for registered users  
 
-The application is deployed and accessible at: jde-taskmanager.vercel.app
+---
 
-Note: The backend is hosted as well, but it may take some time to load after prolonged inactivity. If you want immediate access, you can use the "Continue as Guest" option which uses your browser's local storage instead of the backend server.
+## 🚀 Features
 
-## Technologies Used
+- 🔐 **User Authentication** – Register, log in, or use guest mode  
+- ✅ **Task Management** – Create, edit, complete, and delete tasks  
+- 🗂️ **Categories** – Assign and create custom categories  
+- ⚠️ **Priority Levels** – High, medium, or low  
+- 📅 **Due Dates** – Add due dates with overdue alerts  
+- 🔄 **Drag & Drop** – Reorder tasks easily  
+- 🔍 **Filtering & Sorting** – By status, category, priority, or due date  
+- 🌙 **Dark/Light Mode** – Toggle themes effortlessly  
+- 📴 **Guest Mode** – Use the app with local storage, no login required  
+
+---
+
+## 🌐 Live Demo
+
+**🔗 [jde-taskmanager.vercel.app](https://jde-taskmanager.vercel.app)**  
+⚠️ Backend may take a moment to spin up after inactivity.  
+For instant access, click **“Continue as Guest”** (uses browser local storage).
+
+---
+
+## 🛠️ Tech Stack
 
 ### Frontend
-- React.js with TypeScript
-- React DnD (Drag and Drop)
-- Framer Motion for animations
-- React-DatePicker for date selection
-- Axios for API requests
+- [React.js](https://react.dev/) (with TypeScript)
+- [React DnD](https://react-dnd.github.io/react-dnd/) – Drag and Drop support
+- [Framer Motion](https://www.framer.com/motion/) – Smooth animations
+- [React-Datepicker](https://reactdatepicker.com/) – Date selection
+- [Axios](https://axios-http.com/) – API communication
 
 ### Backend
-- FastAPI (Python)
-- JWT Authentication
-- Database storage for persistent data
+- [FastAPI](https://fastapi.tiangolo.com/) – Python-based API framework
+- JWT for user authentication
+- Supabase for database & auth
+- REST API endpoints for tasks and user management
 
-## How to Use
+---
 
-1. Access the Application:
-   - Visit jde-taskmanager.vercel.app
-   - Choose to sign up, log in, or continue as guest
+## 📦 Getting Started Locally
 
-2. Creating Tasks:
-   - Enter a task title
-   - Select a category (or create a custom one)
-   - Set priority level
-   - Optionally set a due date
-   - Click "Add Task"
+### ⚛️ Frontend
 
-3. Managing Tasks:
-   - Complete tasks by clicking the "Complete" button
-   - Delete tasks with the "Delete" button
-   - Drag and drop to reorder tasks
-   - Filter tasks using the filter options
-   - Search tasks by title
+```bash
+# Clone the repository
+git clone https://github.com/ghruank/jde-taskmanager.git
+cd taskmanager/client
 
-4. Theme Toggle:
-   - Switch between light and dark mode using the theme toggle button in the top right corner
+# Install dependencies
+npm install
 
-## Setting Up Locally
+# Start the development server
+npm run dev
+```
 
-### Frontend Setup
+Access the app at [http://localhost:3000](http://localhost:3000)
 
-1. Clone the repository:
-   git clone [repository-url]
-   cd taskmanager/client
+---
 
-2. Install dependencies:
-   npm install
+### 🐍 Backend
 
-3. Start the development server:
-   npm run dev
+```bash
+# Navigate to the backend directory
+cd taskmanager/server
 
-4. Access the application at http://localhost:3000 or the port shown in your terminal
+# Create and activate a virtual environment
+python -m venv venv
 
-### Backend Setup
+# Windows
+venv\Scripts\activate
 
-1. Navigate to the backend directory:
-   cd taskmanager/server
+# macOS/Linux
+source venv/bin/activate
+```
 
-2. Create and activate a virtual environment:
-   python -m venv venv
-   # On Windows
-   venv\Scripts\activate
-   # On macOS/Linux
-   source venv/bin/activate
+```bash
+# Install dependencies
+pip install -r requirements.txt
+```
 
-3. Install required packages:
-   pip install -r requirements.txt
+Create a `.env` file in the backend root with:
 
-4. Create a .env file with the following variables:
-   SECRET_KEY=your_secret_key_here
-   DATABASE_URL=your_database_url
+```
+SUPABASE_URL=your_supabase_url
+SUPABASE_KEY=your_supabase_key
+SECRET_KEY=your_secret_key
+ALGORITHM=HS256
+```
 
-5. Start the backend server:
-   uvicorn main:app --reload
+```bash
+# Start the FastAPI server
+uvicorn main:app --reload
+```
 
-6. The API will be available at http://localhost:8000
+API will be available at: [http://localhost:8000](http://localhost:8000)
 
-## Offline Usage
+---
 
-The application supports offline usage in guest mode. Your tasks will be stored locally in your browser and will persist between sessions as long as you don't clear your browser data.
+## 📴 Offline Support
 
-## Browser Compatibility
+Guest mode supports full task management with **local browser storage**.  
+Tasks persist between sessions as long as browser data is not cleared.
 
-The Task Manager works best on modern browsers including:
-- Chrome (recommended)
-- Firefox
-- Safari
-- Edge
+---
 
-## Feedback and Issues
+## 🧪 Browser Compatibility
 
-If you encounter any issues or have suggestions for improvements, please feel free to submit them through the repository's issue tracker.
-
+Optimized for all modern browsers:
+- ✅ Chrome (recommended)
+- ✅ Firefox
+- ✅ Safari
+- ✅ Edge
